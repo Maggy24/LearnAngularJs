@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<body ng-controller="EventoController">
+  <div class="container">
+    <p class="lead">Have you passed 5 second after loading? -> {{producidoEvento}}</p>
+  </div>
+  
+  <script data-require="angular.js@1.4.8" data-semver="1.4.8" src="https://code.angularjs.org/1.4.8/angular.js"></script>
+    <script>
+var app = angular.module("app",[]);
+
+app.controller("EventoController", ['$scope', '$timeout', function($scope,$timeout) {
+  
+  $scope.producidoEvento = "NO";
+  
+  $timeout(function() {
+    $scope.producidoEvento = "Yes"
+  }, 5*1000);
+  
+}]);
+  </script>
+</body>
+</html>
