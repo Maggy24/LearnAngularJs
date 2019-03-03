@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+
+<head>
+    <script src="angular.js"></script>
+    <style>
+
+    </style>
+</head>
+
+<body ng-app="app">
+    <div ng-controller="searchCtrl">
+        <div>
+            Enter Number :
+            <input id="myInput" type="text" ng-model="inputId" min="1" max="1000000" integer-number/>
+        </div>
+    </div>
+    <!------------------------------------------ javascipt   ----------------------------------->
+
+    <script>
+        var module = angular.module('app', []);
+		module.controller('searchCtrl', ['$scope', function ($scope) {
+           //$scope.inputId = '';
+        }]);
+        module.directive('integerNumber', function () {
+            return {
+                require: "ngModel",
+                restrict: "A",
+                link: function (scope, element, attr, ctrl, ngModel, max, min) {
+					var model = attr['ngModel'];
+                    scope.$watch(attr.ngModel, function (newValue, oldValue) {
+						if(newValue !== undefined){
+							var maxVal, maxValFloatLength, minVal, lastIndex, intValue, valueInt, valueFloat, value;
+							if(attr.max !== undefined){
+								maxVal = parseFloat(attr.max);
+								maxValFloatLength =  attr.max.length - attr.max.lastIndexOf('.');
+							}
+							if(attr.min !== undefined){
+								minVal = parseFloat(attr.min);
+							}
+							if(newValue.slice(-1) === ',')  
+								{
+									scope[model] = newValue.substring(0,newValue.lastIndexOf(','));
+								}
+							if(newValue.slice(-1) === '.')  
+								{
+									scope[model] = newValue.substring(0,newValue.lastIndexOf('.'));
+								}
+								newValue = newValue.replace(/(,)|(\$)|(\s)/g, '');
+								if(minVal < 0){
+									if(newValue.indexOf('-')== 0 && newValue.length == 1)
+									{
+										newValue = -1;
+									}
+								}
+								if (!isFinite(newValue))
+								{
+									   scope[model] = oldValue;
+								}
+								if(newValue === -1)
+								{
+									newValue = "-";
+								}
+								  lastIndex = (newValue.indexOf('.') == -1)? newValue.length : newValue.indexOf('.');
+								  intValue = newValue.substring(0,lastIndex);
+								  valueInt = intValue.replace(/(\d)(?=(\d{3})+$)/g, '$1,');
+								  console.log('valueInt'+ valueInt);
+								  value = valueInt;
+							 if(newValue !==''){
+								if ((newValue > maxVal) || (newValue < minVal))
+								{
+									   scope[model] = oldValue;
+								}
+							 }else{
+								scope[model] ='';
+							 }
+							if(value.indexOf('-') > -1)
+							{
+								value = value.substring(1);
+								element[0].value = '-$' + value; 
+							}else if(newValue !=='')
+							{
+								element[0].value = '$' + value; 
+							}
+						}
+                    });
+                }
+            };
+        });
+	
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+
+<head>
+     <script src="angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0rc1/angular-route.min.js"></script>
+
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <div ng-app="appModule"  ng-controller="simpleController">
+        <h2> This is the Header</h2>
+
+        <div ng-view> </div>
+
+        <div ng-init="initvalue=1"></div>
+    </div>
+
+   
+    <!------------------------------------------ javascipt   ----------------------------------->
+    
+    <script>
+        var mainModule = angular.module('appModule', ['ngRoute']);
+        mainModule.config(function ($routeProvider, $locationProvider) {
+            //$locationProvider.html5mode(true);
+            $routeProvider.
+            when('/', {
+                templateUrl : "partials/list.html"
+            }).
+            when('/add',{ templateUrl : 'partials/Add.html'}).
+            when('/view/:index',{ templateUrl : 'partials/view.html', controller : 'dataController'}). // It will call the simple controller (constructor)
+            otherwise({redirectTo:'/'});
+            console.log("config initialized");
+        });
+        mainModule.controller('simpleController', ['$scope', function ($scope) {
+            console.log("Inside simpleController");
+            $scope.persons = [
+                {
+                    name : "Jay",
+                    age : 18
+                },{
+                    name : "SanJay",
+                    age : 19
+                },{
+                    name : "ViJay",
+                    age : 20
+                },{
+                    name : "AJay",
+                    age : 21
+                }
+            ];
+            console.log("ng-init initvalue variable value : "+$scope.initvalue);
+            console.log("End simpleController");
+        }]);
+        
+        mainModule.controller('dataController',['$scope','$routeParams',datafunction]);
+        function datafunction($scope,routeParams)
+        {
+            console.log("Inside dataController");
+            $scope.currentIndex = routeParams.index;
+            console.log("ng-init Index variable value : "+$scope.index);
+            console.log("End dataController");
+        }
+    </script>
+</body>
+</html>

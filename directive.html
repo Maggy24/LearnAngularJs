@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<script src="angular.min.js"></script>
+<body ng-app="myApp">
+<div ng-controller="myCtrl">
+    <form name="myfrom">
+        <input type="text" ng-model="myforminput">
+    </form>
+    <br/>
+    <br/>
+    <div ng-model="myInputParent">
+        <input type="text" ng-model="myInput" my-directive>
+       <br/> 
+       MyInput :  {{ myInput }}
+    </div>
+    
+</div>
+<script>
+var app = angular.module('myApp', []);
+app.controller('myCtrl',['$scope',function(scope){
+    console.log("inside Ctrl : ", scope);
+    scope.myInput = "mytext";
+    scope.ctrlText = "text";
+}]);
+    
+    
+app.directive('myDirective', function() {    //how to write Ctrl in directive
+    return {
+        require: 'ngModel',   //it is ngModelController
+/*
+        require : '^mycontrolller', // to get parent directrory controller
+        require : '^^mycontrolller', // to get parent & it's parent dierectory controller
+*/
+        link: function(scope, element, attr, mCtrl) {   //mCtrl is the instance of ngModelController
+            console.log("Scope : ", scope);
+            console.log("element : ", element);
+            console.log("attr : ", attr);
+            console.log("mCtrl : ", mCtrl);
+            
+            function myParser(value) {   
+                console.log("inside myParser : " +value);
+                return '$ '+value; 
+                //returning $viewValue
+            }
+            mCtrl.$parsers.push(myParser);
+            
+            // $parser -- converts a model value into the $viewValue.
+            // $formatter -- converts the $viewValue into the $modelValue
+            // $setViewValue() -- Set the $viewValue.
+            
+            scope.$watch('myforminput', function(newValue , oldValue) {  
+                console.log("NewValue : " + newValue +" OldValue : " + oldValue);
+                mCtrl.$setViewValue("watchText");
+            });
+
+            
+            element.on("keyup",function(e){
+                console.log("Scope : ",scope);
+            });
+            
+            /*
+            $(iElement).find('select').on('change', function() {
+                ngModelCtrl.$setViewValue(...);
+            });*/
+            /*
+            function myFormatter(value) {   
+                console.log("inside myFormatter : " +value);
+                return '$ '+value; 
+                //returning $modelValue
+            }
+            mCtrl.$formatter.push(myFormatter);*/
+            //https://www.nadeau.tv/using-ngmodelcontroller-with-custom-directives/
+			
+			
+			/*
+			Optionally use a controller: require: '?optionalController'
+			Combined: require: '?^optionalParentController'
+			Use the question mark to tell Angular that you can use a controller but 
+			it's not required. Angular will try to find the controller, but if it can't, it'll just give you  null. */
+        }
+    };
+});
+</script>
+</body>
+</html>

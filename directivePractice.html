@@ -1,0 +1,163 @@
+<!doctype html>
+<html>
+
+<head>
+    <script src="angular.js"></script>
+    <style>
+
+    </style>
+</head>
+
+<body ng-app="app">
+    <div ng-controller="searchCtrl">
+        <div>
+            Enter Number :
+            <input id="myInput" type="text" ng-model="inputId" only-number/> {{ inputId }}
+            <br/>
+            <span ng-bind="formattedValue"></span>
+            <br/>
+        </div>
+    </div>
+
+
+    <!------------------------------------------ javascipt   ----------------------------------->
+
+    <script>
+        var module = angular.module('app', []);
+
+        module.directive('onlyNumber',function () {
+            console.log("Inside only-number directives");
+            return {
+                require: "ngModel",
+                restrict: "A",
+                link: function (scope, element, attr, ctrl) {
+                    console.log("Inside link function ", scope);
+                    console.log("KeyPressed");
+                  /*  element.on('keypress', function(e) {
+                        
+                    console.log(`Inside Keypress : `, e);
+                    if(e.keyCode == 44){ return false; } */
+                        
+                    scope.$watch(function (sco) {
+                        return sco.inputId;
+                    }, function (newValue, oldValue) {
+                        console.log(`newValue : ${newValue}  oldValue: ${oldValue}`);
+                        console.log(`isFinite :  ${isFinite(newValue)}`);
+                    
+                        /*
+                      //First time oldValue will be undefined, We have to initialixe the $scope value with "" in controller or else --
+                    // Better to initilize the variable $scope.inputId = ""; otherwise oldValue is undefined get error with indexOf function as well
+                       if(oldValue === undefined)
+                       {
+                          oldValue = "";
+                       }
+                       */
+                        /*
+                      if (!isFinite(newValue)) // newValue.indexOf('.') !== -1   //to remove '.' as well
+                        {
+                             scope.inputId = oldValue;
+                        }
+                        
+                        */
+                    if(newValue != "" || newValue == undefined)
+                    {   
+                        if(newValue.slice(-1) === ',')  
+                        {
+                            scope.inputId = newValue.substring(0,newValue.lastIndexOf(','));
+                        }
+                        
+                        newValue = newValue.replace(/,/g, '');
+                        newValue = newValue.replace(/\$/g, '');
+                        newValue = newValue.replace(/\s/g, '');
+                        
+                        if(newValue.indexOf('-')== 0 && newValue.length == 1)
+                        {
+                            newValue = -1;
+                        }
+                        
+                        
+                        if (!isFinite(newValue)) // newValue.indexOf('.') !== -1   //to remove '.' as well
+                        {
+                           // element[0].value = oldValue;
+                             scope.inputId = oldValue;
+                        }
+                        if(newValue === -1)
+                        {
+                            newValue = "-";
+                        }
+                        
+                      var lastIndex = (newValue.indexOf('.') == -1)? newValue.length : newValue.indexOf('.'); 
+                      var intValue = newValue.substring(0,lastIndex);
+                      console.log(`IntValue : ${intValue} LastInded : ${lastIndex}`);
+                      var value = intValue.replace(/(\d)(?=(\d{3})+$)/g, '$1,');
+                      value = value + newValue.substring(lastIndex,newValue.length);
+                    
+                        
+                     // var value = newValue.replace(/(\d)(?=(\d{3})+$)/g, '$1,');
+                    //   var value = newValue.replace(/(\d)(\b(?=(\d{3})+(\.|$)))/g, '$1,');
+
+                        console.log(`final value ${value}`);
+                      
+                        if(value.indexOf('-') > -1)
+                        {
+                            value = value.substring(1);
+                            element[0].value = "-$" + value; 
+                        }
+                        else
+                        {
+                            element[0].value = "$" + value; 
+                        }
+                        
+                        scope.formattedValue = "$" + value;
+                     }
+                        
+                    /*
+                        var regExp = /^[0-9.,]+$/;
+                        
+                        if(!(regExp.test(newValue)))
+                        {
+                            scope.inputId = oldValue;
+                        }
+                        */
+                        
+                  //  });
+                    });
+                    /*
+                    element.on("keypress", function (evt) {
+                        
+                    });
+                    */
+                }
+            };
+
+        });
+
+        module.controller('searchCtrl', ['$scope', 'personsFactory', function ($scope, personsFactory) {
+            console.log("Inside the searchCtrl");
+            $scope.inputId = ""; // it will help to cusdom directory to improve performace
+            $scope.persons = personsFactory;
+            $scope.formattedValue= $scope.inputId;
+            $scope.ingoreCase = false;
+            console.log("end the searchCtrl");
+        }]);
+
+        module.factory('personsFactory', function () {
+            var persons = [{
+                fname: "Jay",
+                lname: "Rathod"
+              }, {
+                fname: "AJay",
+                lname: "Sinha"
+              }, {
+                fname: "ViJay",
+                lname: "Kapoor"
+              }, {
+                fname: "SanJay",
+                lname: "Gupta"
+            }];
+            return persons;
+        });
+    </script>
+</body>
+
+</html>

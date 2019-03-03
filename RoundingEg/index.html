@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+
+<head>
+     <script src="../angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0rc1/angular-route.min.js"></script>
+
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <div ng-app="app">
+        <h2> This is the Header</h2>
+        <div ng-controller="baseCtrl">
+            <div ng-view> </div>
+        </div>
+    </div>
+
+   
+    <!------------------------------------------ javascipt   ----------------------------------->
+    
+    <script>
+        var module = angular.module('app', ['ngRoute']);
+        module.config(function ($routeProvider, $locationProvider) {
+            $routeProvider.
+            when('/', {
+                templateUrl : "partials/list.html"
+            }).
+            when('/view/:index',{ templateUrl : 'partials/view.html', controller : 'viewCtrl'}). 
+            otherwise({redirectTo:'/'});
+            console.log("config initialized");
+        });
+        module.factory('getData',['$http',function($http){
+              var data = {};
+            /* $http.get('/RoundingEg/data.js').then(function(responseData){
+                 console.log("ResponseData :",responseData);
+                 data = responseData;
+                 console.log("getData : ", data);
+             });
+*/            console.log("Data : ", data);
+            return data;
+        }]);
+        
+        module.controller('baseCtrl', ['$scope','$http', function ($scope,$http) {
+            console.log("Inside baseCtrl");
+             $http.get('/RoundingEg/data.js').then(function(responseData){
+                 console.log("ResponseData :",responseData);
+                 $scope.persons = responseData.data.data;
+             });
+            console.log("End baseCtrl");
+        }]);
+        
+        module.controller('viewCtrl',['$scope','$routeParams', datafunction]);
+        function datafunction($scope,routeParams)
+        {
+            console.log("Inside viewCtrl");
+            //$scope.persons = respData.data;
+            $scope.currentIndex = routeParams.index;
+            console.log("ng-init Index variable value : "+$scope.index);
+            console.log("End viewCtrl");
+        }
+    </script>
+</body>
+</html>

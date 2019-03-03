@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+
+<head>
+    <script src="angular.min.js"></script>
+    <style>
+
+    </style>
+</head>
+
+<body ng-app="appModule">
+    <div ng-controller="simpleController">
+       {{ rootMsg }}
+        <br/>
+       {{ scopeMsg }}
+        <div>{{ (mydata == "data")? "true" : "false" }}</div>
+        <div>{{ !emptydata && "1" || "2"}}</div>
+        <span ng-show="true">ng-show='true'</span> -- visible
+        <div ng-show="false">ng-show='false'</div> <div> -- not visible</div>
+        <span ng-hide="false">ng-hide='false'</span> -- visible
+        <div ng-hide="true">ng-hide='true'</div> <div> -- not visible</div>
+        <div ng-show="12 > 13">ng-show="12 > 13"</div> <div> 12 > 13 -- not visible</div>
+        ---------------------------------------------------------------ng-If
+        <input type="text" ng-model="data.name"/>
+        <div ng-if="!0">
+           <input type="text" ng-model="data.name"/>
+            <span>{{data.name}}</span>
+        </div>
+    </div>
+
+
+    <!------------------------------------------ javascipt   ----------------------------------->
+    <script>
+        var mainModule = angular.module('appModule', []);
+
+        mainModule.controller('simpleController', ['$scope','$rootScope','$timeout',function ($scope,$rootScope,timeout) {
+            $rootScope.rootMsg="Initial root msg";
+            $scope.scopeMsg = "Initial scope msg";
+            $scope.mydata = "data";
+            $scope.emptydata = "";
+            $scope.data = {name : "Sameer"}; //inside ng-if  ng-model or scope will not work without object, (it will create new scope but if there is object it will refer to that object)
+            
+            setTimeout(function(){
+                console.log("setTimeout......");
+                $rootScope.rootMsg = "New root msg";
+                $scope.scopeMsg = "New scope msg";   
+              //  $scope.$digest();
+            },2000);
+            
+            
+            timeout(function(){
+                console.log("angulartimeout......");
+                $rootScope.rootMsg = "angular timeout root msg";
+                $scope.scopeMsg = "angular timeout scope msg";   
+            },5000);
+        }]);
+    </script>
+</body>
+
+</html>

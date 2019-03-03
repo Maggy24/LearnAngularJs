@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+
+<head>
+    <script src="angular.js"></script>
+    <style>
+
+    </style>
+</head>
+
+<body ng-app="app">
+    <div ng-controller="searchCtrl">
+        <div>
+            Enter Number :
+            <input id="myInput" type="text" ng-model="inputId" min="-100" max="1000000.00" decimal-number/>
+			<input id="myInput" type="text" ng-model="inputIdData" min="1" max="1000000.00" decimal-number/>
+			<input id="myInput" type="text" ng-model="inputIdData1" min="1" max="1000000.00000" decimal-number/>
+			<input id="myInput" type="text" ng-model="inputIdData2" max="1000000" decimal-number/>
+			<input id="myInput" type="text" ng-model="inputIdData3" decimal-number/>
+        </div>
+		<button ng-click="inputVal()">Check</button>
+    </div>
+    <!------------------------------------------ javascipt   ----------------------------------->
+
+    <script>
+        var module = angular.module('app', []);
+		module.controller('searchCtrl', ['$scope', function ($scope) {
+          $scope.inputVal = function(){
+			console.log('inputId..'+$scope.inputId);
+			console.log('inputIdData..'+$scope.inputIdData);
+			console.log('inputIdData1..'+$scope.inputIdData1);
+			console.log('inputIdData2..'+$scope.inputIdData2);
+			console.log('inputIdData3..'+$scope.inputIdData3);
+				var amount = $scope.inputIdData3.replace('$', '');
+				var minInvAmount = parseFloat(amount.replace(",", "").replace(",", ""));
+			console.log('minInvAmount..'+minInvAmount);
+		  }
+        }]);
+        module.directive('decimalNumber', function () {
+            return {
+                require: "ngModel",
+                restrict: "A",
+                link: function (scope, element, attr, ctrl, ngModel, max, min) {
+					var model = attr['ngModel'];
+                    scope.$watch(attr.ngModel, function (newValue, oldValue) {
+						if(newValue !== undefined){
+							var maxVal, maxValFloatLength, minVal, lastIndex, intValue, valueInt, valueFloat, value;
+							if(attr.max !== undefined){
+								maxVal = parseFloat(attr.max);
+								maxValFloatLength =  attr.max.length - attr.max.lastIndexOf('.');
+							}
+							if(attr.min !== undefined){
+								minVal = parseFloat(attr.min);
+							}
+							if(newValue.slice(-1) === ',')  
+								{
+									scope[model] = newValue.substring(0,newValue.lastIndexOf(','));
+								}
+								newValue = newValue.replace(/(,)|(\$)|(\s)/g, '');
+								if(minVal < 0){
+									if(newValue.indexOf('-')== 0 && newValue.length == 1)
+									{
+										newValue = -1;
+									}
+								}
+								if (!isFinite(newValue))
+								{
+									   scope[model] = oldValue;
+								}
+								if(newValue === -1)
+								{
+									newValue = "-";
+								}
+								  lastIndex = (newValue.indexOf('.') == -1)? newValue.length : newValue.indexOf('.');
+								  intValue = newValue.substring(0,lastIndex);
+								  valueInt = intValue.replace(/(\d)(?=(\d{3})+$)/g, '$1,');
+								  valueFloat = newValue.substring(lastIndex,newValue.length);
+								  value = valueInt + valueFloat;
+							 if(newValue !==''){
+								if ((newValue > maxVal) || (newValue < minVal) || valueFloat.length > maxValFloatLength)
+								{
+									   scope[model] = oldValue;
+								}
+							 }else{
+								scope[model] ='';
+							 }
+							if(value.indexOf('-') > -1)
+							{
+								value = value.substring(1);
+								element[0].value = '-$' + value; 
+							}else if(newValue !=='')
+							{
+								element[0].value = '$' + value; 
+							}
+						}
+                    });
+                }
+            };
+        });
+	</script>
+</body>
+
+</html>

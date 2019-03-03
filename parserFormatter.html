@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<script src="angular.min.js"></script>
+<body ng-app="myApp">
+<div ng-controller="MainCtrl">
+    <input my-model-formatter type="text" ng-model="mystring">
+	
+	<!-- <input my-model-formatter type="text" ng-model="mystring"> -->
+    <br>
+    mystring value is: <code>{{mystring}}</code>
+    <button ng-click="buttonClick()">Button</button>
+</div>
+<script>
+
+//https://www.nadeau.tv/using-ngmodelcontroller-with-custom-directives/
+var app = angular.module('myApp', []);
+app.directive('myModelFormatter', function() {
+  return {
+    require: 'ngModel',
+	
+	/*
+	scope : {   // all the isolated scope should be in directive attributes like mystring="mystring"
+		mystring : '=?'
+	},
+	*/
+    link: function(scope, element, attrs, controller) {
+	
+	//it will trigger everytime when modalValue get changed  --  javascript side(changing scope object from javascript)
+	//$formatters -- converts the $modelValue into $viewvalue. -- ctrl.$formatters.push(function(modelValue) {}
+     controller.$formatters.push(function fromatterFun(modelValue) {
+	    console.log("formatter modelValue : ",modelValue);
+        console.log(controller);
+        return modelValue.toUpperCase();   //returning viewvalue
+      });
+	  
+	 //it will trigger everytime when viewValue get changed -- Ui side
+	 //$parsers -- converts the $viewValue into $modelValue.  -- ctrl.$parsers.push(function(viewValue) {}  
+     controller.$parsers.push(function parserFun(viewValue) {  
+        console.log("parser viewValue : ",viewValue); 
+        console.log(controller);
+        return viewValue.toLowerCase();  //returning modelvalue
+      });
+      
+	  /*/
+	  //it will execute whenever modal value get changed like formatter (formatter --> render will call if formatter is there)
+      controller.$render = function() {
+        console.log('render : ',controller);
+		console.log('render : ',scope);
+		//scope.mystring = 'HM';  // if isolate scope
+        //controller.$setViewValue('HM');   // it will triger parser method(view value changed)
+        //controller.$viewValue = "hello world2";  // this will not trigger parser  but will set viewvalue value
+		console.log('render : ',controller);
+      };
+	  */
+
+	  
+	   // load init value from DOM
+      //controller.$setViewValue("HM"); //It will trigger the parser because viewValue change
+	  
+	  element.on('blur',function (){
+		console.log("blur");
+		
+	  });
+	  
+    }
+  };
+});
+
+app.controller('MainCtrl', function($scope) {
+	$scope.mystring = 'hello world';  // It will trigger formatter because modelValue change
+	$scope.buttonClick = function(){
+	$scope.mystring = 'World';  // this will call formatter but not parser so W will be in capital
+	console.log(this);
+  };
+});
+    
+</script>
+</body>
+</html>

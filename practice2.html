@@ -1,0 +1,154 @@
+<!doctype html>
+<html>
+
+<head>
+    <script src="angular.min.js"></script>
+    <style>
+
+    </style>
+</head>
+
+<body ng-app="appModule">
+    <div ng-controller="tableController">
+      <div>{{initialValue}}<div>
+        <!-- table using array -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Index</th>
+                    <th>EmpNo</th>
+                    <th>EmpName</th>
+                    <th>Email Address</th>
+                </tr>
+            </thead>
+            <tbody style="text-align:center">
+                <tr ng-repeat="emp in employee">
+                    <td class="row{{$index+1}}">{{$index}}</td>
+                    <td ng-bind="emp.empNo"></td>
+                    <td>{{ emp.empName }}</td>
+                    <td>{{ emp.email }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <!-- end table using array -->
+        <!-- using object -->
+        -----------------------------------------------------------
+        <div> First Employee Information : </div>
+        <div ng-repeat="(key,value) in employee[0]">
+            {{key + " : " + value}}
+        </div>
+        <button ng-click="removeFirstObject()">Remove 0 Index Item</button>
+        <button ng-click="loadAllEmployee()">Load All Emp Details</button>
+    </div>
+    ------------------------------------------------------------------------------
+    <div ng-controller="simpleController">
+        <div>{{initialValue}}<div>
+        <input type="text" ng-model="myInputText" />
+        <div> One time binding (::myInputText) -: {{::myInputText}} </div>
+        <div> Simple binding (Two way) -: {{myInputText}} </div>
+        <div mydirectory="true">Hi</div>
+        <second-Directory>second Directory</second-Directory>
+    </div>
+    <div ng-init="initialValue=11">init value 11: {{initialValue}}</div>
+    <!------------------------------------------ javascipt   ----------------------------------->
+    <script>
+        var mainModule = angular.module('appModule', []);
+
+        mainModule.factory('employeeArray', function () {
+
+            function empDetail(no, name, mail) {
+                this.empNo = no;
+                this.empName = name;
+                this.email = mail;
+            };
+
+            var employee = [new empDetail(106, 'Jayram', 'jayram@cgi.com'),
+                {
+                    "empNo": 101,
+                    "empName": "Jay",
+                    "email": "jay@app.com"
+            }, {
+                    "empNo": 102,
+                    "empName": "Sanjay",
+                    "email": "sanjay@app.com"
+            }, {
+                    "empNo": 103,
+                    "empName": "Ajay",
+                    "email": "ajay@app.com"
+            }, {
+                    "empNo": 104,
+                    "empName": "Vijay",
+                    "email": "vijay@app.com"
+            }, {
+                    "empNo": 105,
+                    "empName": "Dhananjay",
+                    "email": "dhananjay@app.com"
+            }];
+            return employee;
+
+        });
+
+        mainModule.directive('mydirectory', function () {
+
+            return {
+                restrict: 'A',
+                scope: {
+                    mydirectory: '='
+                },
+                template: '<h2>mydirectory : {{mydirectory}}</h3>'
+            };
+
+        });
+        
+        mainModule.directive('secondDirectory',function(){
+            
+            return {
+                restrict : 'EA',
+                transclude : true,
+                //template : '<span style="color:red">This is from template</span>'
+                templateUrl : '/template.html'
+            }; 
+            
+        });
+
+        mainModule.controller('tableController', ['$scope', 'employeeArray', function ($scope, employeeArray) {
+            console.log("tableController Started'");
+            // $scope.employee = angular.copy(employeeArray);
+            $scope.loadAllEmployee = function () {
+                $scope.employee = angular.copy(employeeArray);
+                // $scope.employee = employeeArray;;
+            };
+            $scope.loadAllEmployee();
+            $scope.removeFirstObject = function () {
+                console.log("inside removeFirstObject");
+                $scope.employee.shift();
+                console.log(`$scope.employee = ${JSON.stringify($scope.employee)}
+				employeeArray = ${JSON.stringify(employeeArray)}`);
+            };
+            console.log("tablecontroller End");
+        }]);
+        //////////////////////////////////////////////////////////////////////////////////////
+        
+        mainModule.service('myService',function(){   // implicitly creating object by new operator when injecting
+            console.log("myService initialized");
+            this.serviceData = "My Service Data";  //public varible or methods
+        });
+        mainModule.factory('myFactory',function(){
+            console.log("myFactory initialized");
+            this.myfactoryData = "myFactory data";   // will not work because not creating object by new operator
+            var returndata = {factoryData : "My factory Data"};
+            return returndata;   // must be there else error -- inject undef
+        });
+
+        mainModule.controller('simpleController',['$scope','myService','myFactory',function ($scope,myService,myFactory) {
+            console.log("inside simpleController");
+            $scope.myInputText = "start";
+            console.log($scope.mydirectory);
+            console.log("Service Data : ",myService);
+            console.log("Factory Data : ",myFactory);
+            console.log("end simpleController");
+        }]);
+                
+    </script>
+</body>
+</html>

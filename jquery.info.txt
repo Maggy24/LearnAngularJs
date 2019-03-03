@@ -1,0 +1,35 @@
+$(document).		bind("click",function(){alert('hellow')});		animated({height:'30'});			addClass("intro");				$("p").add("div").add("#div2").css({fontSize:'+=12'});
+$("body").		blur(function(){funcall()});				fadeIn("slow","swing",fuction{callback();});	after("<b>after statement</b>");		$("ul").children().css(...);
+$("head").		change(function(){...});				fadeOut(); fadeToggle();			append("this is text");			contents("hello").hide();
+$("title").			click(function(){'''});				fadeTo(1000,0.4);    //opacity		$("<span>this</span>").appendTo("p");	each(function(){...});
+$("*").			dblclick();						hide("slow",function(){---});			attr("color" ,"blue"); attr("color");		filter(".intro");not(".intro")
+$("#id1").		delegate("p","click" function(){'''});			show(...);				before("this is text");			first();last();
+$(".class1").		focus();						slideDown("slow");				clone(); clone().appendTo("p");
+$(".class1,class2").		focusin();focusout();				slideToggle();slideUp();			css("width","500"); css("width");		next(); prev();
+$("div,p,h3").		hover(function(){---},function(){;;;});			toggle();  //hide & show			css("width":"500","height":"300");
+$("p:first").		mouseenter();mouseleave();									css("width",function(i){return i+25});
+$("P:first:child").		mouseup();mousedown();									detach(); empty();
+$("div>p").		mouseover();mouseout();									hasClass("intro");
+$(":header").		mousemove();										height();width(500);
+$(":animated").		keypress();keyup();keydown();								height(function(n,c){return c+100;});
+$(":focus").		on("click",function(){'''});									html("contents");
+$(":contains('hello')").	off("click");										offset("margin"); x.left ,x.top;
+$(":has('p')").		one("click",function(){...});									position(); x.top,x.left;
+$(":empty").		ready(function(){...});									prepend("text");
+$(":parent").		resize();scroll();										$("<p>hi</p>")prependTo("div");
+$(":hidden").		submit();											prop("color"); prop("color","red");
+$(":visible").		toggle(functin(){..1},function(){...2},function(){..3});						remove();
+$(":[href]").		trigger("select");										removeAttr("style");removeClass("class");
+$(":href='default.html'").	unbind();unload();										removeProp("color");
+$(":[href!=''html]").												$("<h2>hellow</h2>")replaceAll("p");											
+$(":input").													$("p:first").replaceWith("hello");
+$(":text").													scorllLeft();
+$(":password").													scrollTop();
+$(":radio").													toggleClass("classname");													text();
+$(":checkbox").													unwrap();val();
+$(":button").													wrap("<span></span>");wrapAll("<span>");
+$(":image").															
+$(":enabled").
+$(":disabled").
+$(":selected").
+$(":checked").

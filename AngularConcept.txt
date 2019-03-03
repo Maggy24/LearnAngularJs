@@ -1,0 +1,350 @@
+console.log(`My name is ${firstName} ${lastName}`); -- template String
+
+ng-app -- This directive starts an AngularJS Application.
+ng-init --  This directive initializes the data.(here we can declare array, object, variables) declaring multiple variables by semicolumn, 
+specific to html but not binding with $scope varible in controller So Don't use init, it will be global for particular controller & its complicated
+ng-bind -- innerHTMLText (for allElements, its similare to expression where we can write javascript code like 10+20)
+ng-model -- value property -- Only for form Element like input ....
+{{ object.property + " "+ variablename  }} -- ng-href="img/{{username}}.jpg", class="row{{$index+1}}" (interpolation) -- Expression (pure javascript code)
+{{ "" && "1" || "2"}}  //2  -- we can use conditional operators here (&& || !)
+-- style="background-color:blue;width:{{pwidth}}px"
+ (but its not support conditions, loop & exceptional statement only support filters, its can  not access sevices but it support tertiary operator)
+ng-repeat -- This directive repeats html elements for each item in a collection.(no need of use for loop to use creating & updating DOM )
+<li ng-repeat = "country in countries">
+      {{ 'Country: ' + country.name + ', Locale: ' + country.locale }}
+</li>
+
+controller -- controller like class constructor fn.Controller is a class (function in javascript) here we can declare property/attributer/instace variable & 
+function that we are going to operate Here no need to add getters & setters because of two way binding. $scope is created instance/object for that particular class.
+ng-include -- we can include other html pages in html page
+ng-view -- ng-view tag simply creates a place holder where a corresponding view (html or ng-template view) can be placed based on the configuration 
+ng-template -- ng-template directive is used to create an html view using script tag. It contains "id" attribute which is used by $routeProvider to map a 
+view with a controller.
+$routeProvider, ng-view, ng-template --  to achieve SPA
+$routeProvider --  is the key service which set the configuration of urls, map them with the corresponding html page or ng-template, and attach a controller
+with the same.
+$Scope  -- is a special javascript object which plays the role of joining controller with the views
+Sevices -- $route, $http, $location, $window (inbuid services), We can define our own custom services using factory & service function
+It is main use of reusability, Here we can create our service and share the common data in different controllers. 
+Service is a singleton javascript object containing a set of functions to perform certain tasks. Services are defined using service() 
+functions and then injected into controllers. It works as a constructor, it impliciatly create the object using new operator. (So we can use this.name="";)
+factory -- factory is a function which is used to return value. It creates value on demand whenever a service or controller requires. Always must be return statment.
+$event -- it is a object we can pass when firing the event using angularJS like ng-click = "myFun($event)";  it is a similare to browser event object
+angular.copy(obj) --  creating the new object by coping old one (without making reference) deeply coping 
+One time binding: --  {{::name}} -- <li ng-repeat="user in ::vm.users"></li>  -- after one time binding it will not run by $digest loop (improving performance)
+Filters -- {{ expression | filter1 | filter2 | ... }} -- {{ expression | filter:argument1:argument2:... }}.
+{{ filter_expression | filter : expression : comparator}}   -- $filter('filter')(array, expression, comparator) (in javascript).
+<tr ng-repeat="friend in friends | filter:searchText">  //searchText will be string or object ({name:'M'}) name contains M
+angular.module('myReverseFilterApp', [])
+.filter('reverse', function() {
+  return function(input, uppercase) {    // input -- will be bydefault to getting data, uppercase for getting parameter value.
+      return out;
+  };
+  //returned function will execute two time by angular js
+});  // This will work in view fine --  {{greeting|reverse:true}}
+.controller('MyController', ['$scope', 'reverseFilter', function($scope, reverseFilter) {    // reverseFilter -- reverse('filterName') + Filter (PostFix)
+  $scope.greeting = 'hello';
+  $scope.filteredGreeting = reverseFilter($scope.greeting);
+}]);
+
+$filter -- inbuild service to inject in controlller -- $filter('uppercase')($scope.originalText);
+
+ng-model-options="{ updateOn: 'mousedown blur' }" -- directive helps to bind the element only on blur or mousedown event in ng-model case.
+(Bydefault any changes will trigger the bind(update) the element)
+
+directives -- ng-app , ng-model, ng-bind are the inbuild directives, but we can create our own custom directive. just like we can create our custom
+element(tag), attribute, class 
+custom directives --  It can inject services,factories & values.Custom directive will return the object which have following properties -:
+require : "ngModel" //optional --- if we want to communicate with ngModel directive or other custom directive
+restrict : "E"    //EACM  // only for e- elements restrict to particular type only
+template : "<div>User : {{user.firstName}} {{user.lastName}} </div>"   //To add content to innerHTML of the directive
+templateUrl : "/myapp/section1.html" // To add html template to that directive
+transclude : true;  // Add in template ng-transclude directive to stay already elements in that place else it will remove
+compile function : returning linked function // compile function code will execute only once for all directives 
+link function : function (scope,element,attribute,ctrl,transclude); //optional for compile (link function code will execute for every directive)
+Also when creating custom Directive : - isNumber then you should give use in view as is-number attribute
+<div contentEditable="true" ng-model="content" title="Click to edit">Some</div>
+In Html -- my-directory  ===== myDirectory  --  When creating custom directory
+
+(function(angular) {
+  'use strict';
+angular.module('form-example2', []).directive('contenteditable', function() {
+  return {
+    require: 'ngModel',    // this directive communicating with ngModel directive & we are using ngModelController as ctrl in link function
+    link: function(scope, elm, attrs, ctrl,transclude) {
+      // view -> model
+	  // here ctrl is comes from ngModelController (require property) --  we are not creating new one
+      elm.on('blur', function() {
+        ctrl.$setViewValue(elm.html());
+      });
+
+      // model -> view
+      ctrl.$render = function() {
+        elm.html(ctrl.$viewValue);
+      };
+
+      // load init value from DOM
+      ctrl.$setViewValue(elm.html()); 
+	  
+	  // transclude(function(){
+	       elm.find('p').append('<div>df</div');
+	  });
+    }
+  };
+});
+})(window.angular);
+
+Watch function -- $scope.$watch(); AngularJS will create this internally when we do databinding in view using scope object & it will call for object watches. 
+Also we can call it by manually & override the our custom code on predefined watch function for that particular scope.
+$watch function will have arguments :
+1. A Value function with scope argument which will return property or the propertyName ('firstInputId' without scope) to bind to that element
+2. Listener function which have newValue & oldValue argument function(newValue, oldValue) {}
+$scope.$watch(function(scope) { return scope.data.myVar }, // 'inputId'
+              function(newValue, oldValue) {
+                  document.getElementById("").innerHTML =
+                      "" + newValue + "";
+              }
+ );
+	
+$digest() -- this function helps to call listener function manually which is in watch function, which will help to get updated value.
+Most of the time AngularJS will call the $scope.$watch() and $scope.$digest() functions for you, but in some situations you may have to call them yourself. 
+$scope.$digest();   // it will limit for parameter scope which is $scope object . 
+$apply() -- The $scope.$apply() function takes a function as parameter which is executed, and after that $scope.$digest() is called internally.
+$scope.$apply(function() {
+    $scope.data.myVar = "Another value";
+});
+
+Minification Safe Dependency Injection in AngularJS --  ['myfactory','myService',function(){}]
+When you minify JavaScript the JavaScript minifier replaces the names of local variables and parameters with shorter names. To avoid name mismatch in
+function parameter we using array with function name string or function itself (anonymous function).
+
+Dependency Injection -: depend on other components ( Value,Factory,Service,Provider,Constant ). They all can depend on each other also.
+
+value -- mymodule.value('decoration', {symbol: '*'}) --- A value in AngularJS is a simple object. It can be a number, string or JavaScript object. 
+Values are typically used as configuration which is injected into factories, services or controllers.
+factory -- myModule.factory() -- function which returns value, objects.
+service -- myModule.service() -- function which return value, objects (functions).
+provider -- with confing function 
+constant  -- constant file is created to pass variable to config file because we can't inject with services, values in config method
+
+Dependencies Between Modules -- 
+
+It is possible for one module to use the values, factories and services of another module. In order to do so, a module needs to declare a dependency
+on the module which contains the values, factories and services it wants to use. Here is an example
+
+var myUtilModule = angular.module("myUtilModule", []);
+myUtilModule.value  ("myValue"  , "12345");
+
+var myOtherModule = angular.module("myOtherModule", ['myUtilModule']);
+   myOtherModule.controller("MyController", function($scope, myValue) {
+});
+
+angular.bootstrap -- angular.bootstrap(document.getElementById("app2"),['practice2']); // To add multiple ng-app in same html page,
+(only one ng-app auto bootsraped by the angular js iteself with the help of angular js ng-app directive)
+var dvSecond = document.getElementById("app2");
+angular.element(document).ready(function() {
+   angular.bootstrap(dvSecond, ['secondApp']);
+});
+
+ng-repeat --  to repeat the element in html There are six variables ($index,$first,$last,$middle,$even,$odd)
+iterating over array -- ng-repeat = "i in arr"
+iterating over object -- ng-repeat = "(key,value) in myobject"		-- inside ng-repeat element we can use (myobject[key]) 
+$index -- return number (start from 0 to length-1)
+$first,$last,$middle,$even,$odd -- return boolean true/false; eg :- ng-if="$odd"
+track by $index -- to allow duplicates value to binding
+
+ng-show,hide.if = expression or true/False -- syntax
+ng-show="true" -- display:block;
+ng-hide="true" -- display:none;
+ng-show="12 > 13" -- (false) display:none;
+ng-show="'fd'=='fb'" -- (false) display:none;
+ng-show/ng-hide --  working as css property display changes.
+ng-if --  Direct working on DOM (create/remove elements)
+ng-if = "!1"  -- (false)  remove the element from DOM (here we can't dom node of ng-if)
+ng-if -- Create/Remove the elements from the DOM. The potential problem with using ng-show/hide comes from Angular $digest loop. Ng-show can hide something from
+a user but not from the Angular $digest loop and watches. This can slow down performance if enough things are being watched on a page. By using ng-if, the DOM 
+element will be removed and any watchers with it. If ngModel is used within ngIf to bind to a JavaScript primitive defined in the parent scope, any modifications
+made to the variable within the child scope will not affect the value in the parent scope.(it will create new scope for ng-if related dom elements but if there 
+is object insted of primitive datatype,it will refer to that object)
+ng-if --  Inside ng-if, if there is databinding with scope variable will not work, So it should always be in object formate or use $parent to achive databinding.
+<input type="text" ng-model="data"/> //separate scope object
+<div ng-if="!0">
+   <input type="text" ng-model="data"/>  //separate scope object
+	<span>{{data.name}}</span>
+</div>  // So not working databinding
+To help that use - : data.name in ng-model or use $parent.data ($parent object) inside ng-if Dom
+ng-model-options -- ng-model-options="{ updateOn: 'blur' }"
+
+setTimeout & setInterval (not supporting $digest cycle) in JavaScript don't call the apply & digest function automatically in angularJS.
+$timeout(function(){}, 2000) -- Executes callback function only once after givent time
+promise = $interval(function(){}, 2000,) -- Executes callback function repeatedly untill we not clear the interval;
+$interval(fn, delay, [count], [invokeApply], [Pass]);
+$interval.cancel(promise);
+ngRoute -- ngRoute is a module(It is declared in separate js file which is we have to include in html file), It is required to inject when creating module 
+for useful to access the routeProvider
+$routeProvider -- is a route provider service where we have to map/route the url, it should be injected in config function.
+$routeProvider.when('mapping',{templateUrl:"path of html template",controller:"to call the controller"}).when .....).otherwise({redirectTo:"/"});
+$locationProvider --  to access location related propertise
+$routeParams --  to access passed parameter which is mapped({{index}}) in the url by routeProvider
+
+$log() -- it helps to debug the app & explain the object information in console (it is very useful for $http service request)
+$log.info(responnse);
+$http -- to retrive / get data from database (same as ajax) 
+$http({
+   method : "GET",
+   url : "String"
+});  // configuration object
+$http.get('url').then(function(responnse){'resopnsedata'},function(reason){'error'}); == $http.get('url').then(succesCallback,errorCallback); //by service method
+OR success function instead of then function but most priority to then function
+response or reason object has following objects :-
+data : string/object to send to the request data
+config : requested configuration object
+header : headers getters function
+status : status number
+statusText : statustext string
+
+Shortcuts methods - :
+$http.get -- 
+$http.post -- 
+$http.put -- 
+$http.head -- 
+$http.delete -- 
+$http.jsonp --
+$http.patch -- 
+
+$http.get('/someUrl', config).then(successCallback, errorCallback);
+$http.post('/someUrl', data, config).then(successCallback, errorCallback); // config -- configuration data (last parameter), data -- passing data to database
+
+$resource- service in module ngResource -- inject in module A factory which creates a resource object that lets you interact with RESTful server-side data 
+sources.
+$q- service in module ng. A service that helps you run functions asynchronously(promises in javascript), and use their return values (or exceptions) when they 
+are done processing.
+$parser -- 
+attr.$set() -- to Change the html attribute value.
+attr.$observe() -- to be notify when the html attribute change
+
+Angular Directive  -- 
+1. Any time if we need to interface with DOM that where the comes directive.
+2. Create separate new model for all custom directive & inject that in app module.
+3. In html "my-directive" == "myDirective" in javascript
+4. Isolate scope -- it should do not inherit from enclosing scope -- to reuse the directive, more confortable with third party directive -- scope : {}
+5. compile function -- convert the html string into angular template, when we need to add/remove dom elements after link time
+6. link function -- insert the angular template into dom with scope as context
+7. transclude --  it will allow us specify the position to add the elements , predefined directive with transclude -- ng-repeat,ng-switch,ng-if
+
+<my-directive search-text="someVariable" param1="My Name is {{myName}}" param3="doSomething(myName)" start-num="10">
+		<span ng-click="searchClicked">Click hear</span>
+</my-directive>
+mydirModule.directive('myDirective',function(){
+   return {
+			restrict : "E",
+			transclude : true,   //picture frame, it will allow us to put the element where we want
+			scope : {},     // isolated scope else link function scope will be from eclosing scope, OR
+			scope : {                     //isolate scope
+				searchText : "=",     //Two way binding
+				param1 : "@",			// one-way Expression (top-down)
+				param3 : "&"			//one-way behaviour   (bottom-up)  // ng-click approach
+			},
+			template : "<div></div",  // optional to link function
+			templateUrl : "/add.html", // optional to link function	
+			link : function(scope,element,attr,ctrl){
+			    element.focus(function(){
+				});
+				scope.searchClicked = function(){};    
+				scope.num = attr.startNum; // to get the value from the attribute. attr.$set() -- to change the value, $attrs.observer() --  to notify when html attribute change
+			
+			},
+			compile : function(element,attr,linker){   // optional to link function
+			     // it always return the link function
+			}
+   };
+});
+
+ng-click="main.fun($event)" --  to send the event object -- $scope.main.fun(event){}
+angular.element --
+$parser -- 
+angular constant -- 
+
+
+controller  --- similar to constuctor -- business logic for the view
+factory & services ---  singletons(executes & return only once when first time application is loading for all module & its controller) 
+factory & services --- shared the data inside & across the module -- reusable business logic for views
+Grunt and  Gulp -- javascript task runner
+Grunt -- The less work you have to do when performing repetitive tasks like minification, compilation, unit testing, linting, etc, the easier your job becomes.
+bower -- To get started, Bower works by fetching and installing packages from all over, taking care of hunting, finding, downloading, and saving the stuff you’re 
+looking for. Bower keeps track of these packages in a manifest file, bower.json. it is a package manager for our app.
+mocha, karma, jasmin (ngMock module in angular) -- javascript testing framework, unit testing --  to write the testing code (testing task) & test cases. 
+Also making the asynchronously testing simple & fun.
+
+polymer google- L preview
+Angular JsS -- framework for dynamic web app, two way of databinding, SPA (controlling the DOM structure,showing & hiding the DOM , routing), support form validation,
+supports event handling -- helping the html template for reusable components-- supporting the testing
+
+
+
+// Promise
+function mget(){
+	return new Promise(function(resolve, reject){
+		setTimeout(function(){ 
+			resolve(10);		// will call first then function
+			reject(10);			// will call second then funcion
+		},3000)
+	});
+};
+
+// then we can use only if we getting promise object with resolve & reject implementation
+
+mget().then(function(resp){     	// then has resolve & reject object as above
+	console.log("Success ",resp);
+	},
+	function(resp){
+	console.log("failed");
+});
+
+then ---> always return the promise object implicitly
+////----------
+// Need to install Batrang- debug extension
+angular.element($0).scope()  --  to retrive the scope when debugging
+angular.element($0).controller() -- getting entire controller objects view
+angular.element($0).controller('ngModel');  -- we can get ngModel controller if that element have ng-model directive
+angular.element($0).data();
+angular.element($0).inheritedData();
+angular.element(document.getElementById('yourElementId')).scope()
+angular.element('[ng-controller=ctrl]').scope()
+// Update page to reflect changed variables
+angular.element(myDomElement).scope().$apply();
+$($0).isolateScope()
+$($0).scope()
+$($0).scope().$parent
+<!-- ngIf: isFoo -->   --  $($0).scope().isFoo
+
+// take look on first time changing form elements --- validation msg
+// dirty checking
+
+
+DI (Dependency Injection)- is a creating components or software design pattern to deal with thire depedencies
+component such as  --  Service, factory, constant, value, filter,  provider
+Controller can inject with - Service, value, factory, filter & providers
+run method can inject -- service, constant, values (can't inject providers)
+config method can inject --  providers, constant (can't inject with service, values)
+provider method can inject -- services
+
+When controller inject provider ---  it inject object created by provider  (provider.$get function return value)
+But config inject provider (provider name with Provider suffix) --- it inject provider object itself to do a configuration in providers.  
+
+Custom directive with $parser, $formatter & $validatores -- https://www.nadeau.tv/using-ngmodelcontroller-with-custom-directives/
+$parsers -- converts the $viewValue into $modelValue.  -- ctrl.$parsers.push(function(viewValue) {}  
+$formatters -- converts the $modelValue into $viewvalue. -- ctrl.$formatters.push(function(modelValue) {}
+$validators -- to override methods on inbuild validators  --  ctrl.$validators.integer = function(modelValue, viewValue) {}
+
+
+var pwdArray = document.querySelectorAll("input[type=password]");
+var submitButtonArray = document.querySelectorAll("button[type=submit]");
+
+for(var i=0;i<submitButtonArray.length;i++){
+    d[i].addEventListener("click",function(e){
+        for(var j=0;j<pwdArray.length;j++){
+           localStorage.setItem(""+j, pwdArray[j].value);
+        }
+    });
+}

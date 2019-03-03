@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+
+<head>
+    <script src="angular.min.js"></script>
+    <style>
+
+    </style>
+</head>
+
+<body ng-app="app">
+    <div ng-controller="searchCtrl">
+        <div>
+            Search :
+            <input type="text" ng-model="inputId" /> {{ inputId }}
+            <br/>
+            <input type="checkbox" ng-model="ingoreCase"> Ignore Case {{ ingoreCase }}
+            <ul>
+                <li ng-repeat="person in persons | search:inputId:ingoreCase">
+                    {{person.fname}} {{person.lname}}
+                </li>
+            </ul>
+        </div>
+    </div>
+
+
+    <!------------------------------------------ javascipt   ----------------------------------->
+
+    <script>
+        var module = angular.module('app', []);
+
+        module.filter('search', function () {
+            console.log("Inside search filter");
+            //console.log($scope.persons);
+            function searchName(inputArray, searchString, ingoreCase) {
+                console.log("Inside searchName function");
+                if (searchString == null || searchString == undefined) {
+                    return inputArray;
+                }
+                console.log(`inputArray : ${inputArray} searchString : ${searchString} IgnoreCase ${ingoreCase}`);
+
+                /*
+                return inputArray.filter(function (value,index) {   //returning Array  or we can add var outputArray & return it
+                    var firstName = value.fname;
+                    if(ingoreCase){
+                        console.log("Ignoring Case");
+                        firstName = value.fname.toLowerCase();
+                        searchString = searchString.toLowerCase();
+                    }
+                    if(firstName.indexOf(searchString) !== -1){
+                         return true;
+                    }
+                    return false;
+                });
+            */
+
+                var outputArray = [];
+                inputArray.forEach(function (value, index) {
+                    var firstName = value.fname;
+                    if (ingoreCase) {
+                        console.log("Ignoring Case");
+                        firstName = value.fname.toLowerCase();
+                        searchString = searchString.toLowerCase();
+                    }
+                    if (firstName.indexOf(searchString) !== -1) {
+                        outputArray.push(value);
+                    }
+                });
+                return outputArray;
+            }
+            console.log("End search filter");
+            return searchName; // returned fuction will execute two time by angular compiler itself
+        });
+
+        module.controller('searchCtrl', ['$scope', 'personsFactory', function ($scope, personsFactory) {
+            console.log("Inside the searchCtrl");
+            $scope.persons = personsFactory;
+            $scope.ingoreCase = false;
+            console.log("end the searchCtrl");
+        }]);
+
+        module.factory('personsFactory', function () {
+            var persons = [{
+                fname: "Jay",
+                lname: "Rathod"
+              }, {
+                fname: "AJay",
+                lname: "Sinha"
+              }, {
+                fname: "ViJay",
+                lname: "Kapoor"
+              }, {
+                fname: "SanJay",
+                lname: "Gupta"
+            }];
+            return persons;
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,57 @@
+<html>
+
+<body>
+    <script>
+        // Revelaing Module pattern
+        var Module = (function () { //  IIFE -- Immediately Invoked Function Expression
+
+            var _privateMethod = function (message) { //Private method naming convention [started with underscore]
+                console.log("inside Privatemethod");
+                console.log(message);
+            };
+
+            var publicMethod = function (text) {
+                console.log("inside publicmethod");
+                privateMethod(text);
+            };
+
+            return {
+                publicMethod: publicMethod
+            };
+
+        })();
+
+        console.log("Module : ", Module);
+
+        var ModuleTwo = (function (Module) {
+
+            Module.extension = function () {
+                console.log("Inside extension");
+            };
+
+            return Module;
+
+        })(Module || {}); // if undefined then does not throw error
+        
+        // Here Module & ModuleTwo are referring for same object
+
+        console.log("Module after Extended in another module : ", Module);
+        console.log("ModuleTwo after Extended in another module : ", ModuleTwo);
+        
+        Module.myMethod = function () {
+            console.log("inside  Module.myMethod");
+        };
+        
+    /*    console.log("Module after Module.myMethod decl : ", Module);
+        console.log("ModuleTwo after Module.myMethod decl : ", ModuleTwo);  */
+        
+        ModuleTwo.myMethod2 = function () {
+            console.log("inside ModuleTwo.myMethod2");
+        };
+        
+      /*  console.log("ModuleTwo after ModuleTwo.myMethod2 decl : ", ModuleTwo);
+        console.log("Module after ModuleTwo.myMethod2 decl : ", Module);    */
+    </script>
+</body>
+
+</html>

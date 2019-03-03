@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+   
+   <head>
+    <script src = "https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.17/angular.min.js"></script>
+   </head>
+   
+   <body ng-app = "myapp"> 
+      <div ng-controller = "HelloController" >
+         <h2>Welcome {{helloTo.title}} to the world of Tutorialspoint!</h2>
+        <span ng-bind = 'helloTo.spantext + " + " + helloTo.title'>
+        </span> 
+        <span ng-bind="10+20" id="spanId"></span>
+        <br>
+        <input type="text" ng-bind="helloTo.spantext" ng-model="helloTo.title"/>
+       <br/> 
+       <input type="text" ng-model="helloTo.input1" value="sdfs"/>
+       <br/>
+        <input type="text" value="sdfs"/>
+        <i ng-model="helloTo.spantext"> itag</i>   <!-- ng-model will not work -->
+        <div ng-init = 'arr = ["first","Second"]'> 
+              {{arr[0]}}
+        </div>
+        <div ng-init = 'varname = 10;obj={"username":"firstname", "id":1001}'></div>
+        <span>
+                {{obj.id + " " + varname}}
+        </span>
+         {{ clickcounter + 1 }}   <!-- clickcounter undefined -->
+         <br/>
+        <input type = "checkbox" ng-model = "showHide1">
+         <button ng-hide = "showHide1">check the checkbox to hide Me!</button>
+      </div>
+     
+      
+      <script>
+        var myapp = angular.module("myapp", []);
+         
+         myapp.controller("HelloController", function($scope,$log) {
+            $scope.helloTo = {};
+            $scope.helloTo.title = "AngularJS";
+            $scope.helloTo.spantext = "spanelement";
+            $scope.helloTo.input1 = "input1";
+            this.thisObj  = "Ram";
+            console.dir($scope);
+            console.log("ng-init arr : ",$scope.arr);
+            console.dir(this);
+            console.log("Element : ",angular.element(document.querySelector("#spanId")));
+            console.log("Scope : ",angular.element(document.querySelector("#spanId")).scope());
+            console.log("data : ",angular.element(document.querySelector("#spanId")).data());
+            $log.log("sdfsfsd");
+         });
+      </script>
+      
+   </body>
+</html>

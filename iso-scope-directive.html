@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<script src="angular.min.js"></script>
+<body ng-app="myApp">
+<div ng-controller="myCtrl">
+    <form name="myfrom">
+        <input type="text" ng-model="myforminput">
+    </form>
+    <br/>
+    <br/>
+<div>
+    <input type="text" ng-model="myInput" attherate="{{ctrlText}}" stext="sText" info="name" isequalto="myInput" amphersign="myfun()" myattr="myattr" my-directive>
+    <br/> 
+    MyInput :  {{ myInput }}
+</div>
+</div>
+<script>
+var app = angular.module('myApp', []);
+app.controller('myCtrl',['$scope',function(scope){
+    console.log("inside Ctrl : ", scope);
+    scope.myInput="mytext";
+    scope.ctrlText = "ctext";
+    scope.sText = "stextvalue";
+    scope.name = "Vijay";
+    scope.temp = " temporary ";
+        
+    scope.myfun = function(){
+        console.log("hi inside myfun");
+    }
+}]);
+    
+    //$observe --  how to use
+app.directive('myDirective', function() {    //how to write Ctrl in directive
+    return {
+        require: 'ngModel',   //it is ngModelController (it wil take ngModelController from ngModel direciver which is already written by angularJs)
+        
+      //  scope : false,          // default value (it will inherit all scope variable from ctrl)
+        
+        scope : {               // creating isolating scope
+            attherate : '@', // one way binding  -  with controller
+            isequalto : '=',   // Two way data- binding with controller
+            stext : '@',        // one way binding (it  will work as a string)
+            myname :  '=info',  // if direcive name not same  
+            mfun : '&amphersign' // delegate to controller function
+        },
+        conroller : ['$scope',function($scope){}],      //To add controller in direcive (two dierctives communication can be done using controller) 
+        link: function(scope, element, attr, mCtrl) {   //mCtrl is the instance of ngModelController (without require property we can't get mCtrl)
+            console.log("Scope : ", scope);
+            console.log("element : ", element);
+            console.log("attr : ", attr);
+            console.log("mCtrl : ", mCtrl);
+                     
+            scope.$watch('isequalto', function(newValue , oldValue) {  
+                console.log("NewValue : " + newValue +" OldValue : " + oldValue);
+            });
+
+            /*
+            //It will work only if scope obj value is false like above
+            scope.$watch(attr.isequalto, function(newValue , oldValue) {  // also attr.ngModel (dynamically for multi dierctive watch)
+                console.log("NewValue : " + newValue +" OldValue : " + oldValue);
+            });
+            */
+
+            attr.$observe('myattr', function(value) {   // It will observe on directive value change (we can observe it on ngModel directive as well)
+                console.log('myattr has changed value to ' + value);
+            });
+
+            
+            element.on("keyup",function(e){
+                console.log("Scope : ",scope);  
+                scope.isequalto = "$" + scope.isequalto;
+                scope.attherate = "$" + scope.attherate;
+                scope.stext = "$" + scope.stext;
+                scope.mfun();
+                
+                attr.$set('myattr', 'attempt');    // We can set the attributes
+                // $addClass , $removeClass , $observe ,  $updateClass
+            });
+                    
+        }
+        /* //
+        compile : function(element,attr,transclude){
+            console.log("Inside compile function");
+        }*/
+		
+		
+		
+		//https://www.nadeau.tv/using-ngmodelcontroller-with-custom-directives/
+    };
+});
+</script>
+</body>
+</html>

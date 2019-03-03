@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<script src="angular.min.js"></script>
+<body ng-app="myApp">
+
+<p>Try writing in the input field:</p>
+
+<form name="myForm" novalidate>
+    MyInput : <input name="myInput" type="text" ng-model="myInputModel" required my-directive><br/>
+    MyEmail : <input name="myEmail" type="email" ng-model="myEmailModel"><br/>
+    
+    <input type="submit" value="Submit" ng-disabled="myForm.myInput.$error.required">
+    <div ng-show="myForm.$submitted">
+        <div ng-show="myForm.$invalid"> Form Inputs is invalid </div>
+    </div>
+</form>
+    MyInput2 : <input name="myInput2" type="text" ng-model="myInputModel2" required my-directive><br/>
+
+
+
+<p>The input's valid state is:</p>
+<h5>myForm Validation : {{myForm.$valid}}</h5>
+<h5>myInput required Validation error obj : {{myForm.myInput.$error}}</h5>
+<h5>myInput required Validation : {{myForm.myInput.$error.required}}</h5>
+
+
+<h5>myInputModel2 required Validation : {{myInputModel2}}</h5>
+
+<p>Input Validation : </p>
+
+<div ng-if="myForm.myInput.$touched || myForm.$submitted">  
+        <div ng-show="myForm.myInput.$error.required"> myInput is required </div>
+        <div ng-show="myForm.myInput.$error.charE && !myForm.myInput.$error.required"> myInput should content 'e' character</div>
+        <div ng-show="myForm.myEmail.$invalid"> myEmail is invalid </div>
+</div>
+<br/><br/>
+<script>
+    /// without form validation
+    //ngModel
+    
+var app = angular.module('myApp', []);
+app.directive('myDirective', function() {
+    return {
+        require: 'ngModel',
+        link: function(scope, element, attr, mCtrl) {
+            console.log("Scope : ",scope);
+            console.log("element : ",element);
+            console.log("attr : ",attr);
+            console.log("mCtrl : ",mCtrl);
+            function myValidation(value) {   
+                console.log("inside myValidation : " +value);
+                if (value.indexOf("e") > -1) {
+                    mCtrl.$setValidity('charE', true);
+                } else {
+                    mCtrl.$setValidity('charE', false);
+                }
+                return value;
+            }
+            mCtrl.$parsers.push(myValidation);
+            
+            element.on("keyup",function(e){
+                console.log("Scope : ",scope);
+            });
+        }
+    };
+});
+
+
+
+/*
+    $error obj -- if we have multiple validation for particular element (multiple error msg)
+    $valid , $invalid -- will return true and false for particular element and form as well
+    
+    Bydefault --- every ng-model, ng-show , ng-hide and ng-if it will add watchers
+ng-empty
+ng-not-empty
+ng-touched
+ng-untouched
+ng-valid
+ng-invalid
+ng-dirty
+ng-pending
+ng-pristine
+//custom
+ng-valid-required ng-invalid-required
+ng-invalid-charE ng-invalid-charE
+
+
+ng-model-options="{ updateOn: 'mousedown blur' }"  //https://docs.angularjs.org/guide/forms
+
+*/
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!doctype html>
+<html>
+
+<head>
+    <script src="angular.min.js"></script>
+    <style>
+
+    </style>
+</head>
+
+<body>
+   
+   <div ng-app="practice1">
+    <div ng-controller="firstController">
+        <input type="text" ng-model="firstInputId" />
+        <div ng-init="user={'fname':'Raj Sinha'};count=10">
+            <div ng-bind="firstDivId"></div>
+            <span class="firstSpan">{{user.fname + " + " + count }}</span>
+        </div>
+    </div>
+    <div ng-controller="secondController">
+        <input type="text" ng-model="secondInputId" />
+        <div ng-bind="secondDivId | reverse:false"></div>
+        <input type="text" ng-model="test" only-number/>
+        <span class="secondSpan">{{ myfactory.startName() }}</span>
+        <input type="text" ng-model="numberOnlyModel" is-number/>
+    </div>
+  </div>
+   
+   <!-- ----------------------------------------- -->
+   
+   Second Module started --
+    <div id="app2" ng-app="practice2">
+      <div ng-controller="firstController">
+        <input type="text" ng-model="firstInputId" />
+        <div>
+            <div ng-bind="firstDivId"></div>
+            <span class="firstSpan">{{user.surname + " + " + user.count }}</span>
+        </div>
+      </div>
+      <div ng-controller="thirdController">
+        <input type="text" ng-model="thirdInputId" />
+        <div ng-bind="thirdDivId | reverse:true"></div>
+        <input type="text" ng-model="test" only-number/>
+        <span class="thirdSpan">{{ myfactory.startName() }}</span>
+      </div>
+    </div>
+    
+    <script>
+     
+        var mySharedElements = angular.module("mySharedElements", []);   //custom created -- not depend on directives
+
+        mySharedElements.service("sharedService", function () {
+           
+          //  var employee = function (){
+                this.empId = 101;
+                this.empName = "Shriram";
+                this.age = 199;
+        //    };
+         //   var emp = new employee();
+         //   return emp;   // No need to create and return the object ( service will always created by new operator)
+        });
+        
+        mySharedElements.directive('isNumber', function () {
+            return {
+                require: 'ngModel',
+                link: function (scope) {    
+                    scope.$watch('numberOnlyModel', function(newValue,oldValue) {
+                        var arr = String(newValue).split("");
+                        if (arr.length === 0) return;
+                        if (arr.length === 1 && (arr[0] == '-' || arr[0] === '.' )) return;
+                        if (arr.length === 2 && newValue === '-.') return;
+                        if (isNaN(newValue)) {
+                            scope.numberOnlyModel = oldValue;
+                        }
+                    });
+                }
+            };
+        });
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////
+        var mainModule = angular.module("practice1", ['mySharedElements']);
+        
+        mainModule.value("user",{name:"Raj",surname:"Kapoor",count:20});
+        mainModule.controller('firstController', ['$scope', 'sharedService',function ($scope,sharedService) {
+
+            $scope.firstInputId = "first";
+            $scope.firstDivId = "Sam";
+            console.log("firstController from practice1");
+            console.log(` Id : ${sharedService.empId} EmpName :  ${sharedService.empName} Emp Object : ${JSON.stringify(sharedService)}`);
+            
+            $scope.$watch('firstInputId',function(newValue,oldValue){
+                console.log(oldValue+ " "+newValue);
+                
+                if(oldValue == 1)
+                {
+                    $scope.firstInputId = "one";
+                }
+                
+            });
+            
+        }]);
+
+        mainModule.controller('secondController', ['$scope', 'myService', 'myFactory','$window', function ($scope, myservice, myfactory,window) {
+            console.log(myfactory);
+            $scope.secondInputId = myservice.getSurName("Raje");
+            // $scope.secondInputId = myfactory.startName(); 
+            $scope.secondDivId = myfactory.startName();
+           }]);
+
+        mainModule.directive('onlyNumber', ['$window', 'myService', function (window, myservice) {
+            console.log(myservice, window);
+            return {
+                require: "ngModel",
+                link: function (scope, element, attrs, ctrl) {
+                    console.log(element);
+                    
+                    ctrl.$setViewValue(element.value="Start");
+                    ctrl.$render = function () {
+                        element.value = ctrl.$viewValue;
+                    }; 
+                    
+                    element.on("keypress", function (evt) {
+                        console.log(scope.secondInputId);
+                        console.log("pressed");
+                        console.log("isnumber");
+                       /* evt = (evt) ? evt : window.event;
+
+                        var charCode = (evt.which) ? evt.which : evt.keyCode;
+                        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                            
+                            return false;
+                        }
+                        
+                        return true;*/
+                    });
+                    
+                }
+            };
+
+           }]);
+        mainModule.service('myService', function (myFactory) {
+            console.log(myFactory);
+            return {
+                "name": "samsung",
+                "getSurName": function (sam) {
+                    return 'Hello' + myFactory.startName() + sam;
+                }
+            };
+
+        });
+        mainModule.factory('myFactory', function () {
+
+            function name() {
+                return ' Shivaji ';
+            }
+            return {
+                "startName": name
+            };
+
+        });
+        mainModule.filter('reverse',function(){
+            
+            function reverse(inputs,filterParameter){
+                
+                var output = "";
+                for(var i=0;i<inputs.length;i++)
+                {
+                    output = inputs.charAt(i) + output;        
+                }
+                if(filterParameter)
+                  return output;
+                else
+                  return inputs;
+            }
+            return reverse;
+            
+        });
+///////////////////////////////////////////// Second Module ////////////////////////////////////////
+        
+        var secondModule = angular.module('practice2',['practice1']);
+        secondModule.controller('firstController',['$scope','user',function($scope,user){
+            $scope.user = user;
+            console.log("firstcontroller from practice 2");
+            console.log(user);
+        }]);
+        secondModule.controller('thirdController', ['$scope','myFactory',function($scope,myfactory){
+            $scope.thirdDivId = myfactory.startName();  // we can access the factory of another module
+             //reverse filter we can access in view
+            console.log("Inside practice2 firstcontroller");
+            console.log(myfactory.startName());
+        }]);
+        angular.bootstrap(document.getElementById("app2"),['practice2']); // To add multiple ng-app tag
+        
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    </script>
+</body>
+</html>
